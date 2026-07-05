@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>PostLens</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --bg:    #0a0a0f;
+  --surf:  #13131a;
+  --surf2: #1c1c27;
+  --border:#2a2a3d;
+  --acc:   #6c63ff;
+  --acc2:  #a78bfa;
+  --glow:  rgba(108,99,255,0.12);
+  --text:  #e8e8f0;
+  --muted: #7a7a9a;
+  --ok:    #34d399;
+  --err:   #f87171;
+  --warn:  #fbbf24;
+  --r:     10px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  width: 420px; height: 580px;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+  background: var(--bg); color: var(--text);
+  font-family: 'Inter', sans-serif; font-size: 13px; line-height: 1.5;
+}
+
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+a { color: var(--acc2); text-decoration: none; }
+
+.hdr {
+  background: var(--surf); border-bottom: 1px solid var(--border);
+  padding: 11px 16px; display: flex; align-items: center; justify-content: space-between;
+  flex-shrink: 0;
+}
+.logo { display: flex; align-items: center; gap: 8px; }
+.logo-icon {
+  width: 28px; height: 28px;
+  background: linear-gradient(135deg, var(--acc), var(--acc2));
+  border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 15px;
+}
+.logo-name { font-size: 15px; font-weight: 700; letter-spacing: -.4px; }
+.logo-name span { color: var(--acc2); }
+.hdr-right { display: flex; align-items: center; gap: 8px; }
+.key-badge { font-size: 10px; color: var(--muted); font-family: monospace; }
+
+.btn {
+  padding: 7px 14px; border-radius: var(--r);
+  font-family: inherit; font-size: 12px; font-weight: 600;
+  cursor: pointer; border: none; transition: all .18s; white-space: nowrap;
+}
+.btn-pri { background: linear-gradient(135deg, var(--acc), #8b5cf6); color: #fff; }
+.btn-pri:hover { opacity: .85; transform: translateY(-1px); }
+.btn-pri:disabled { opacity: .4; transform: none; cursor: not-allowed; }
+.btn-pri.success { background: linear-gradient(135deg, #059669, #34d399); }
+.btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--muted); }
+.btn-ghost:hover { border-color: var(--acc); color: var(--acc2); }
+.btn-sm { padding: 4px 10px; font-size: 11px; }
+.btn-full { width: 100%; }
+
+.setup { flex: 1; overflow-y: auto; padding: 20px 16px; }
+.setup h2 { font-size: 14px; font-weight: 700; margin-bottom: 5px; }
+.setup p { color: var(--muted); font-size: 12px; margin-bottom: 16px; line-height: 1.6; }
+
+.prov-toggle { display: flex; gap: 6px; margin-bottom: 14px; }
+.prov-btn {
+  flex: 1; padding: 8px;
+  background: var(--surf2); border: 1px solid var(--border);
+  border-radius: var(--r); color: var(--muted);
+  font-size: 12px; font-weight: 600; cursor: pointer;
+  font-family: inherit; transition: all .18s; text-align: center;
+}
+.prov-btn.active { border-color: var(--acc); color: var(--acc2); background: var(--glow); }
+
+.input-row { display: flex; gap: 8px; margin-bottom: 8px; }
+input[type="password"], input[type="text"] {
+  background: var(--surf2); border: 1px solid var(--border);
+  color: var(--text); border-radius: var(--r);
+  padding: 8px 11px; font-family: inherit; font-size: 12px;
+  outline: none; width: 100%; transition: border-color .2s;
+}
+input:focus { border-color: var(--acc); }
+.hint { font-size: 11px; color: var(--muted); line-height: 1.5; }
+
+.status {
+  padding: 6px 16px;
+  background: var(--surf2); border-bottom: 1px solid var(--border);
+  font-size: 11px; color: var(--muted);
+  display: flex; align-items: center; gap: 6px; flex-shrink: 0;
+}
+.dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.dot.ok   { background: var(--ok);   box-shadow: 0 0 5px var(--ok); }
+.dot.warn { background: var(--warn); box-shadow: 0 0 5px var(--warn); }
+.dot.pulse { background: var(--acc2); animation: pulse 1s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+.tabs {
+  display: flex; gap: 2px; padding: 8px 16px 0;
+  background: var(--surf); border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.tab {
+  background: none; border: none; color: var(--muted);
+  font-family: inherit; font-size: 12px; font-weight: 500;
+  padding: 6px 13px; cursor: pointer;
+  border-bottom: 2px solid transparent; border-radius: 6px 6px 0 0; transition: all .18s;
+}
+.tab:hover { color: var(--text); }
+.tab.active { color: var(--acc2); border-bottom-color: var(--acc); background: var(--glow); }
+
+.body { flex: 1; overflow-y: auto; padding: 14px 16px; }
+
+.panel { display: none; }
+.panel.active { display: block; }
+
+.lbl {
+  font-size: 11px; font-weight: 600; color: var(--muted);
+  text-transform: uppercase; letter-spacing: .06em; margin-bottom: 8px;
+}
+.chips { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 12px; }
+.chip {
+  background: var(--surf2); border: 1px solid var(--border);
+  color: var(--muted); border-radius: 20px;
+  padding: 4px 12px; font-size: 11px; font-weight: 600;
+  cursor: pointer; transition: all .15s;
+}
+.chip:hover, .chip.active { border-color: var(--acc); color: var(--acc2); background: var(--glow); }
+.tip { font-size: 11px; color: var(--muted); margin-top: 8px; line-height: 1.6; }
+.tip.time { color: var(--warn); margin-top: 6px; }
+.mb { margin-bottom: 10px; }
+
+.result-box { margin-top: 14px; border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; }
+.result-bar {
+  background: var(--surf); border-bottom: 1px solid var(--border);
+  padding: 7px 12px; display: flex; align-items: center; justify-content: space-between;
+}
+.result-meta { font-size: 11px; color: var(--muted); }
+.result-content {
+  background: var(--surf2); padding: 13px;
+  font-size: 12.5px; line-height: 1.65; max-height: 240px; overflow-y: auto;
+}
+.result-content h3 { font-size: 12.5px; font-weight: 700; color: var(--acc2); margin: 14px 0 5px; }
+.result-content h3:first-child { margin-top: 0; }
+.result-content h4 { font-size: 12px; font-weight: 600; margin: 8px 0 3px; }
+.result-content ul { padding-left: 16px; margin: 4px 0; }
+.result-content li { margin-bottom: 4px; }
+.result-content strong { color: var(--acc2); }
+.result-content .err { color: var(--err); font-size: 12px; }
+
+.toast {
+  position: fixed; bottom: 12px; left: 50%;
+  transform: translateX(-50%) translateY(60px);
+  background: var(--surf2); border: 1px solid var(--border);
+  color: var(--text); padding: 7px 16px; border-radius: 20px; font-size: 12px;
+  transition: transform .22s ease; z-index: 999; white-space: nowrap; pointer-events: none;
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+.toast.error { border-color: var(--err); color: var(--err); }
+.toast.success { border-color: var(--ok); color: var(--ok); }
+
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="logo">
+    <div class="logo-icon">🔍</div>
+    <div class="logo-name">Post<span>Lens</span></div>
+  </div>
+  <div class="hdr-right">
+    <span class="key-badge" id="key-badge"></span>
+    <button class="btn btn-ghost btn-sm" id="change-key">⚙ Key</button>
+  </div>
+</div>
+
+<div class="setup hidden" id="setup">
+  <h2>Connect your API key</h2>
+  <p>Your key is stored only on your device — sent directly to the AI provider. PostLens has no server.</p>
+  <div class="lbl">Choose provider</div>
+  <div class="prov-toggle">
+    <button class="prov-btn" id="prov-gemini">Gemini (Free)</button>
+    <button class="prov-btn" id="prov-anthropic">Anthropic ($5 min)</button>
+  </div>
+  <div class="input-row">
+    <input type="password" id="key-input" placeholder="Paste your API key..."/>
+    <button class="btn btn-pri" id="save-btn">Save Key</button>
+  </div>
+  <p class="hint" id="key-hint"></p>
+</div>
+
+<div class="main hidden" id="main">
+
+  <div class="status" id="status">
+    <span class="dot warn"></span> Checking page...
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="insights">Insights</button>
+    <button class="tab" data-tab="topic">Topic Insights</button>
+  </div>
+
+  <div class="body">
+
+    <!-- Insights -->
+    <div class="panel active" id="panel-insights">
+      <div class="lbl">How many recent posts?</div>
+      <div class="chips">
+        <span class="chip active" data-val="10">10</span>
+        <span class="chip" data-val="25">25</span>
+        <span class="chip" data-val="50">50</span>
+      </div>
+      <input type="hidden" id="insights-count" value="10"/>
+      <button class="btn btn-pri btn-full" id="run-insights">Analyze</button>
+      <p class="tip">AI selects the most insightful posts and surfaces key themes, ideas, and patterns.</p>
+    </div>
+
+    <!-- Topic Insights -->
+    <div class="panel" id="panel-topic">
+      <div class="lbl">Topic</div>
+      <input type="text" id="topic-input" class="mb" placeholder="e.g. leadership, AI, SQL..."/>
+      <div class="lbl">From how many recent posts?</div>
+      <div class="chips">
+        <span class="chip active" data-val="10">10</span>
+        <span class="chip" data-val="25">25</span>
+      </div>
+      <input type="hidden" id="topic-count" value="10"/>
+      <button class="btn btn-pri btn-full" id="run-topic">Analyze Topic</button>
+      <p class="tip">Checks every post for your topic and summarizes what's relevant.</p>
+      <p class="tip time">⏱ 25 posts may take up to 60 seconds</p>
+    </div>
+
+    <!-- Result -->
+    <div class="result-box hidden" id="result-box">
+      <div class="result-bar">
+        <span class="result-meta" id="result-meta"></span>
+        <button class="btn btn-ghost btn-sm" id="copy-btn">Copy MD</button>
+      </div>
+      <div class="result-content" id="result-content"></div>
+    </div>
+
+    <div style="margin-top:10px;text-align:right">
+      <button class="btn btn-ghost btn-sm" id="debug-btn">🔧 Debug</button>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="src/popup.js"></script>
+</body>
+</html>

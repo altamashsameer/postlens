@@ -25,7 +25,7 @@
 ## Install in 3 Steps
 
 ### 1. Download
-Click **Releases** on the right → Download `postlens.zip` → Unzip it
+Download `postlens.zip` → Unzip it
 
 ### 2. Load into Chrome
 1. Open Chrome and go to `chrome://extensions`

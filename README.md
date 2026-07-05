@@ -51,7 +51,7 @@ Download `postlens.zip` → Unzip it
 4. Hit **Analyze**
 
 
-** IF IT THROWS ERROR, PLEASE RELOAD THE PAGE, IT WILL WORK FINE. **
+**IF IT THROWS ERROR, PLEASE RELOAD THE PAGE, IT WILL WORK FINE.**
 ---
 
 ## Privacy & Security
